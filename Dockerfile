@@ -73,6 +73,7 @@ RUN --mount=type=cache,target=/root/.cache/ccache \
 
 RUN git clone https://github.com/LMCache/LMCache
 WORKDIR /workspace/LMCache/third_party/torchac_cuda
+RUN git checkout dev # TODO: REMOVE THIS FOR MAIN BRANCH BUILD IN THE FUTURE
 RUN --mount=type=cache,target=/root/.cache/ccache \
     --mount=type=cache,target=/root/.cache/pip \
     python3 setup.py bdist_wheel --dist-dir=dist_torchac_cuda
@@ -170,11 +171,13 @@ ENTRYPOINT ["python3", "-m", "vllm.entrypoints.openai.api_server"]
 # openai api server alternative
 FROM vllm-openai AS vllm-lmcache
 
+ARG LMCACHE_COMMIT_ID=1
 WORKDIR /lmcache
 
 # install additional dependencies for openai api server
 RUN git clone https://github.com/LMCache/LMCache
 WORKDIR /lmcache/LMCache
+RUN git checkout dev
 RUN pip install -r requirements.txt
 RUN pip install -e .
 
